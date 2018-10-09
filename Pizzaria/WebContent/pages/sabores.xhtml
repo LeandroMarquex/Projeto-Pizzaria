@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/templates/modeloSistema.xhtml">
+	<ui:define name="menu">
+		<ui:include src="/includes/menu.xhtml" />
+	</ui:define>
+	<ui:define name="conteudo">
+		
+		<h:form id="frmsabores">
+			<p:dataTable 
+			id="tbsabores"
+				emptyMessage="Nenhum registro encontrado"
+				value="#{MBSabores.itens}" 
+				var="item" 
+				paginator="true" 
+				rows="8"
+				filteredValue="#{MBSabores.itensFiltrados}"
+				widgetVar="tabelaSabores"
+				>
+
+				<f:facet 
+				name="header">SISTEMA DE PIZZARIA</f:facet>
+				<p:column 
+				headerText="Codigo" sortBy="#{item.codigo}"
+					filterBy="#{item.codigo}">
+					<h:outputText value="#{item.codigo}" />
+				</p:column>
+				<p:column headerText="Descrição" sortBy="#{item.codigo}"
+					filterBy="#{item.descricao}">
+					<h:outputText value="#{item.descricao}" />
+				</p:column>
+				<p:column headerText="Ingredientes" sortBy="#{item.codigo}"
+					filterBy="#{item.ingredientes}">
+					<h:outputText value="#{item.ingredientes}" />
+				</p:column>
+				
+				
+				<p:column headerText="Opções">
+					<p:commandButton 
+						icon="ui-icon-trash"
+						
+						oncomplete="PF('dlgforExcluir').show();"
+						update=":frmforExcluir:pnforExcluir" >
+					<f:setPropertyActionListener value="#{item}" target="#{MBSabores.sabores}"></f:setPropertyActionListener>
+					</p:commandButton>
+					
+            
+                   
+					<p:commandButton icon="ui-icon-pencil"
+					
+						oncomplete="PF('dlgforEditar').show();"
+						update=":frmforEditar:pnforEditar" 
+						actionListener="#{MBSabores.editar}">
+						<f:setPropertyActionListener value="#{item}" target="#{MBSabores.sabores}"></f:setPropertyActionListener>
+						</p:commandButton>
+
+				</p:column>
+				<!-- TELA DE GRAVAR -->
+				<f:facet name="footer">
+					<p:commandButton value="Novo"
+						actionListener="#{MBSabores.prepararNovo}"
+						oncomplete="PF('dlgforNovo').show();"
+						update=":frmsabNovo:pnforNovo" />
+				</f:facet>
+			</p:dataTable>
+
+		</h:form>
+		<!-- TELA DE GRAVAR e LIMPA TELA-->
+		<p:dialog widgetVar="dlgforNovo" closable="false" draggable="false"
+			resizable="false" header="Cadastratar SABORES" modal="true"
+			appendTo="@(body)">
+			<h:form id="frmsabNovo">
+				<h:panelGrid id="pnforNovo" columns="2">
+					<p:outputLabel value="Descrição" for="txtDescNovo"/>
+					<h:inputText 
+						id="txtDescNovo"
+						size="30" 
+						maxlength="50"
+						value="#{MBSabores.sabores.descricao}" 
+						required="true" 
+						requiredMessage="O Campo descrição é obrigatório."/>
+						
+					<p:outputLabel value="Ingredientes" for="txtIngrNovo"/>
+					<h:inputText 
+						id="txtIngrNovo"
+						size="30" 
+						maxlength="50"
+						value="#{MBSabores.sabores.ingredientes}" 
+						required="true" 
+						requiredMessage="O Campo ingredientes é obrigatório."/>
+						
+						
+				</h:panelGrid>
+				
+				<!--GRAVA NO BANCO - MENSAGEM DE ERRO-->
+				<h:panelGrid columns="2">
+					<p:commandButton value="Gravar"
+						actionListener="#{MBSabores.novo}"
+						oncomplete="PF('dlgforNovo').hide(); PF('tabelaSabores').clearFilters();"
+						update=":frmsabores:tbsabores :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgforNovo').hide();" />
+				</h:panelGrid>
+
+			</h:form>
+		</p:dialog>
+
+		
+
+		<p:dialog widgetVar="dlgforExcluir" closable="false" draggable="false"
+			header="Excluir Sabores" modal="true" appendTo="@(body)">
+
+			<h:form id="frmforExcluir">
+				<h:panelGrid id="pnforExcluir" columns="2">
+					<h:outputText value="Código" />
+					<h:outputText value="#{MBSabores.sabores.codigo}" />
+
+					<h:outputText value="Descrição" />
+					<h:outputText value="#{MBSabores.sabores.descricao}" />
+					
+					<h:outputText value="Ingredientes" />
+					<h:outputText value="#{MBSabores.sabores.ingredientes}" />
+
+				</h:panelGrid>
+			
+
+				<p:panelGrid columns="2">
+					<p:commandButton value="Excluir"
+						actionListener="#{MBSabores.excluir}"
+						oncomplete="PF('dlgforExcluir').hide(); PF('tabelaSabores').clearFilters();"
+						update=":frmsabores:tbsabores :msgGlobal" />
+
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgforExcluir').hide();" />
+				</p:panelGrid>
+			</h:form>
+		</p:dialog>
+		
+		<p:dialog widgetVar="dlgforEditar" closable="false" draggable="false"
+			resizable="false" header="Editar Fornecedor" modal="true"
+			appendTo="@(body)">
+
+			<h:form id="frmforEditar">
+				<h:panelGrid id="pnforEditar" columns="2">
+					<h:outputText value="Código" />
+					<h:outputText value="#{MBSabores.sabores.codigo}" />
+
+					<h:outputLabel value="Descrição" for="txtDescEditar" />
+					<h:inputText 
+					required="true" 
+					requiredMessage="O Campo descrição é obrigatório."
+					value="#{MBSabores.sabores.descricao}"
+					id="txtDescEditar" />
+					
+					<h:outputLabel value="Ingredientes" for="txtIngrEditar" />
+					<h:inputText 
+					required="true" 
+					requiredMessage="O Campo descrição é obrigatório."
+					value="#{MBSabores.sabores.ingredientes}"
+					id="txtIngrEditar" />
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Editar"
+						actionListener="#{MBSabores.editar}"
+						oncomplete="PF('dlgforEditar').hide(); PF('tabelaSabores').clearFilters();"
+						update=":frmsabores:tbsabores :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgforEditar').hide();" />
+				</h:panelGrid>
+
+			</h:form>
+
+		</p:dialog>
+
+
+	
+
+
+	</ui:define>
+</ui:composition>
